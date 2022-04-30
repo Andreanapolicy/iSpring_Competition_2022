@@ -1,6 +1,6 @@
 PROGRAM Chess(INPUT, OUTPUT);
 CONST
-  MAX_FIELD_SIZE = 8;
+  MAX_FIELD_SIZE = 8;                                                                                                                                                                                                               
   QUEEN_SYMBOL = 'Q';
   BISHOP_SYMBOL = 'B';
   KNIGHT_SYMBOL = 'K';
@@ -9,16 +9,16 @@ CONST
 
 TYPE
   FieldState = (UnderAttack, Void, Knight, Bishop, Queen);
-  Field = ARRAY[1 .. MAX_FIELD_SIZE, 1 .. MAX_FIELD_SIZE] OF FieldState;
+  Field = ARRAY[1 .. MAX_FIELD_SIZE, 1 .. MAX_FIELD_SIZE] OF FieldState;                                                        
 
 VAR
   ChessField: Field;
-
+                         
 FUNCTION ConvertLetterToDigit(Letter: CHAR): INTEGER;
 VAR
   ConvertedValue: INTEGER;
 BEGIN
-  ConvertedValue := BYTE(Letter) - BYTE('A') + 1;
+  ConvertedValue := BYTE(Letter) - BYTE('a') + 1;
   ConvertLetterToDigit := ConvertedValue
 END;
 
@@ -64,13 +64,14 @@ BEGIN
   WHILE NOT EOF
   DO
     BEGIN
-      WRITELN(Letter);
-      WRITELN(ColumnIndex);
-      WRITELN(Value);
+      READ(Letter);
+      READ(RowIndex);
+      READ(Value);
+      READ(Value);
                 
-      RowIndex := ConvertLetterToDigit(Letter);
+      ColumnIndex := ConvertLetterToDigit(Letter);
       State := ConvertSymbolToFieldState(Value);
-      ChessField[RowIndex][ColumnIndex] := State;
+      ChessField[MAX_FIELD_SIZE - RowIndex + 1][ColumnIndex] := State;
       
       READLN
     END
@@ -100,9 +101,9 @@ BEGIN
       WRITELN
     END
 END;
-  
+
 BEGIN
   InitChessField(ChessField);
-  //FillChessField(ChessField);
+  FillChessField(ChessField);
   WriteField(ChessField) 
 END.
