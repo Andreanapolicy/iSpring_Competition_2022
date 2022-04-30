@@ -76,6 +76,51 @@ BEGIN
       READLN
     END
 END;
+   
+PROCEDURE PaintOverChessFieldByQueenAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
+VAR
+  Step: INTEGER;
+BEGIN
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexI + IndexJ - Step >= 1) AND (IndexI + IndexJ - Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI + IndexJ - Step][Step] = Void)
+      THEN
+        ChessField[IndexI + IndexJ - Step][Step] := UnderAttack;
+        
+      IF (IndexI - IndexJ + Step >= 1) AND (IndexI - IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI - IndexJ + Step][Step] = Void)
+      THEN
+        ChessField[IndexI - IndexJ + Step][Step] := UnderAttack;
+        
+      IF ChessField[IndexI][Step] = Void
+      THEN
+        ChessField[IndexI][Step] := UnderAttack;
+        
+      IF ChessField[Step][IndexJ] = Void
+      THEN
+        ChessField[Step][IndexJ] := UnderAttack
+    END
+END;
+
+PROCEDURE PaintOverChessField(VAR ChessField: Field);
+VAR
+  IndexI, IndexJ: INTEGER;
+  Letter: CHAR;
+  Value: CHAR;
+  State: FieldState;
+BEGIN
+  FOR IndexI := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      FOR IndexJ := 1 TO MAX_FIELD_SIZE
+      DO
+        BEGIN
+           CASE ChessField[IndexI][IndexJ] OF
+             Queen: PaintOverChessFieldByQueenAttack(ChessField, IndexI, IndexJ)
+           END  
+        END
+    END
+END;
 
 PROCEDURE InitChessField(VAR ChessField: Field);
 VAR
@@ -105,5 +150,7 @@ END;
 BEGIN
   InitChessField(ChessField);
   FillChessField(ChessField);
+ // WriteField(ChessField);
+  PaintOverChessField(ChessField);
   WriteField(ChessField) 
 END.
