@@ -53,28 +53,9 @@ BEGIN
   ConvertSymbolToFieldState := State;
 END;
 
-PROCEDURE FillChessField(VAR ChessField: Field);
-VAR
-  IndexI, IndexJ: INTEGER;
-  ColumnIndex, RowIndex: INTEGER;
-  Letter: CHAR;
-  Value: CHAR;
-  State: FieldState;
+FUNCTION IsFigure(State: FieldState): BOOLEAN;
 BEGIN
-  WHILE NOT EOF
-  DO
-    BEGIN
-      READ(Letter);
-      READ(RowIndex);
-      READ(Value);
-      READ(Value);
-                
-      ColumnIndex := ConvertLetterToDigit(Letter);
-      State := ConvertSymbolToFieldState(Value);
-      ChessField[MAX_FIELD_SIZE - RowIndex + 1][ColumnIndex] := State;
-
-      READLN
-    END
+  IsFigure := (State = Queen) OR (State = Bishop) OR (State = Knight);
 END;
    
 PROCEDURE PaintOverChessFieldByQueenAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
@@ -84,22 +65,98 @@ BEGIN
   FOR Step := 1 TO MAX_FIELD_SIZE
   DO
     BEGIN
-      IF (IndexI + IndexJ - Step >= 1) AND (IndexI + IndexJ - Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI + IndexJ - Step][Step] = Void)
+      IF (IndexI - Step >= 1) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND IsFigure(ChessField[IndexI  - Step][IndexJ + Step])
       THEN
-        ChessField[IndexI + IndexJ - Step][Step] := UnderAttack;
+        BREAK;
         
-      IF (IndexI - IndexJ + Step >= 1) AND (IndexI - IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI - IndexJ + Step][Step] = Void)
+      IF (IndexI - Step >= 1) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI - Step][IndexJ + Step] = Void)
       THEN
-        ChessField[IndexI - IndexJ + Step][Step] := UnderAttack;
+        ChessField[IndexI - Step][IndexJ + Step] := UnderAttack
+    END;
+  
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexJ + Step <= MAX_FIELD_SIZE) AND IsFigure(ChessField[IndexI][IndexJ + Step])
+      THEN
+        BREAK;
         
-      IF ChessField[IndexI][Step] = Void
+      IF (IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI][IndexJ + Step] = Void)
       THEN
-        ChessField[IndexI][Step] := UnderAttack;
+        ChessField[IndexI][IndexJ + Step] := UnderAttack
+    END;  
+    
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND IsFigure(ChessField[IndexI + Step][IndexJ + Step])
+      THEN
+        BREAK;
         
-      IF ChessField[Step][IndexJ] = Void
+      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI + Step][IndexJ + Step] = Void)
       THEN
-        ChessField[Step][IndexJ] := UnderAttack
-    END
+        ChessField[IndexI + Step][IndexJ + Step] := UnderAttack
+    END;  
+    
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexI + Step <= MAX_FIELD_SIZE) AND IsFigure(ChessField[IndexI + Step][IndexJ])
+      THEN
+        BREAK;
+        
+      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI + Step][IndexJ] = Void)
+      THEN
+        ChessField[IndexI + Step][IndexJ] := UnderAttack
+    END;   
+    
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ - Step >= 1) AND IsFigure(ChessField[IndexI + Step][IndexJ - Step])
+      THEN
+        BREAK;
+        
+      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ - Step >= 1) AND (ChessField[IndexI + Step][IndexJ - Step] = Void)
+      THEN
+        ChessField[IndexI + Step][IndexJ - Step] := UnderAttack
+    END;
+  
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexJ - Step >= 1) AND IsFigure(ChessField[IndexI][IndexJ - Step])
+      THEN
+        BREAK;
+        
+      IF (IndexJ - Step >= 1) AND (ChessField[IndexI][IndexJ - Step] = Void)
+      THEN
+        ChessField[IndexI][IndexJ - Step] := UnderAttack
+    END;   
+    
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexI - Step >= 1) AND (IndexJ - Step >= 1) AND IsFigure(ChessField[IndexI - Step][IndexJ - Step])
+      THEN
+        BREAK;
+        
+      IF (IndexI - Step >= 1) AND (IndexJ - Step >= 1) AND (ChessField[IndexI - Step][IndexJ - Step] = Void)
+      THEN
+        ChessField[IndexI - Step][IndexJ - Step] := UnderAttack
+    END;  
+    
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexI - Step >= 1) AND IsFigure(ChessField[IndexI - Step][IndexJ])
+      THEN
+        BREAK;
+        
+      IF (IndexI - Step >= 1) AND (ChessField[IndexI - Step][IndexJ] = Void)
+      THEN
+        ChessField[IndexI - Step][IndexJ] := UnderAttack
+    END;
 END;
 
 PROCEDURE PaintOverChessFieldByBishopAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
@@ -154,6 +211,41 @@ BEGIN
     ChessField[IndexI - 2][IndexJ + 1] := UnderAttack;
 END;
 
+PROCEDURE InitChessField(VAR ChessField: Field);
+VAR
+  IndexI, IndexJ: INTEGER;
+BEGIN
+  FOR IndexI := 1 TO MAX_FIELD_SIZE
+  DO
+    FOR IndexJ := 1 TO MAX_FIELD_SIZE
+    DO
+      ChessField[IndexI][IndexJ] := Void
+END;  
+
+PROCEDURE FillChessField(VAR ChessField: Field);
+VAR
+  IndexI, IndexJ: INTEGER;
+  ColumnIndex, RowIndex: INTEGER;
+  Letter: CHAR;
+  Value: CHAR;
+  State: FieldState;
+BEGIN
+  WHILE NOT EOF
+  DO
+    BEGIN
+      READ(Letter);
+      READ(RowIndex);
+      READ(Value);
+      READ(Value);
+                
+      ColumnIndex := ConvertLetterToDigit(Letter);
+      State := ConvertSymbolToFieldState(Value);
+      ChessField[MAX_FIELD_SIZE - RowIndex + 1][ColumnIndex] := State;
+
+      READLN
+    END
+END;  
+
 PROCEDURE PaintOverChessField(VAR ChessField: Field);
 VAR
   IndexI, IndexJ: INTEGER;
@@ -176,17 +268,6 @@ BEGIN
     END
 END;
 
-PROCEDURE InitChessField(VAR ChessField: Field);
-VAR
-  IndexI, IndexJ: INTEGER;
-BEGIN
-  FOR IndexI := 1 TO MAX_FIELD_SIZE
-  DO
-    FOR IndexJ := 1 TO MAX_FIELD_SIZE
-    DO
-      ChessField[IndexI][IndexJ] := Void
-END;
-
 PROCEDURE WriteField(VAR ChessField: Field);
 VAR
   IndexI, IndexJ: INTEGER;
@@ -204,7 +285,6 @@ END;
 BEGIN
   InitChessField(ChessField);
   FillChessField(ChessField);
- // WriteField(ChessField);
   PaintOverChessField(ChessField);
   WriteField(ChessField) 
 END.
