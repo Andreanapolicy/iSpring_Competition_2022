@@ -72,7 +72,7 @@ BEGIN
       ColumnIndex := ConvertLetterToDigit(Letter);
       State := ConvertSymbolToFieldState(Value);
       ChessField[MAX_FIELD_SIZE - RowIndex + 1][ColumnIndex] := State;
-      
+
       READLN
     END
 END;
