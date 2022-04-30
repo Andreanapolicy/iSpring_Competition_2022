@@ -102,6 +102,58 @@ BEGIN
     END
 END;
 
+PROCEDURE PaintOverChessFieldByBishopAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
+VAR
+  Step: INTEGER;
+BEGIN
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexI + IndexJ - Step >= 1) AND (IndexI + IndexJ - Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI + IndexJ - Step][Step] = Void)
+      THEN
+        ChessField[IndexI + IndexJ - Step][Step] := UnderAttack;
+        
+      IF (IndexI - IndexJ + Step >= 1) AND (IndexI - IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI - IndexJ + Step][Step] = Void)
+      THEN
+        ChessField[IndexI - IndexJ + Step][Step] := UnderAttack
+    END
+END;
+
+PROCEDURE PaintOverChessFieldByKnightAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
+BEGIN    
+  IF (IndexI - 1 >= 1) AND (IndexJ - 2 >= 1) AND (ChessField[IndexI - 1][IndexJ - 2] = Void)
+  THEN
+    ChessField[IndexI - 1][IndexJ - 2] := UnderAttack;
+        
+  IF (IndexI - 2 >= 1) AND (IndexJ - 1 >= 1) AND (ChessField[IndexI - 2][IndexJ - 1] = Void)
+  THEN
+    ChessField[IndexI - 2][IndexJ - 1] := UnderAttack;
+        
+  IF (IndexI + 2 <= MAX_FIELD_SIZE) AND (IndexJ - 1 >= 1) AND (ChessField[IndexI + 2][IndexJ - 1] = Void)
+  THEN
+    ChessField[IndexI + 2][IndexJ - 1] := UnderAttack;
+        
+  IF (IndexI + 1 <= MAX_FIELD_SIZE) AND (IndexJ - 2 >= 1) AND (ChessField[IndexI + 1][IndexJ - 2] = Void)
+  THEN
+    ChessField[IndexI + 1][IndexJ - 2] := UnderAttack;
+        
+  IF (IndexI + 1 <= MAX_FIELD_SIZE) AND (IndexJ + 2 <= MAX_FIELD_SIZE) AND (ChessField[IndexI + 1][IndexJ + 2] = Void)
+  THEN
+    ChessField[IndexI + 1][IndexJ + 2] := UnderAttack;
+        
+  IF (IndexI + 2 <= MAX_FIELD_SIZE) AND (IndexJ + 1 <= MAX_FIELD_SIZE) AND (ChessField[IndexI + 2][IndexJ + 1] = Void)
+  THEN
+    ChessField[IndexI + 2][IndexJ + 1] := UnderAttack;
+        
+  IF (IndexI - 1 >= 1) AND (IndexJ + 2 <= MAX_FIELD_SIZE) AND (ChessField[IndexI - 1][IndexJ + 2] = Void)
+  THEN
+    ChessField[IndexI - 1][IndexJ + 2] := UnderAttack;
+        
+  IF (IndexI - 2 >= 1) AND (IndexJ + 1 <= MAX_FIELD_SIZE) AND (ChessField[IndexI - 2][IndexJ + 1] = Void)
+  THEN
+    ChessField[IndexI - 2][IndexJ + 1] := UnderAttack;
+END;
+
 PROCEDURE PaintOverChessField(VAR ChessField: Field);
 VAR
   IndexI, IndexJ: INTEGER;
@@ -116,7 +168,9 @@ BEGIN
       DO
         BEGIN
            CASE ChessField[IndexI][IndexJ] OF
-             Queen: PaintOverChessFieldByQueenAttack(ChessField, IndexI, IndexJ)
+             Queen: PaintOverChessFieldByQueenAttack(ChessField, IndexI, IndexJ);
+             Bishop: PaintOverChessFieldByBishopAttack(ChessField, IndexI, IndexJ);
+             Knight: PaintOverChessFieldByKnightAttack(ChessField, IndexI, IndexJ);
            END  
         END
     END
