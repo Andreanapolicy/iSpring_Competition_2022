@@ -57,47 +57,11 @@ FUNCTION IsFigure(State: FieldState): BOOLEAN;
 BEGIN
   IsFigure := (State = Queen) OR (State = Bishop) OR (State = Knight);
 END;
-   
-PROCEDURE PaintOverChessFieldByQueenAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
+  
+PROCEDURE ProcessHorizontalLine(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
 VAR
   Step: INTEGER;
-BEGIN
-  FOR Step := 1 TO MAX_FIELD_SIZE
-  DO
-    BEGIN
-      IF (IndexI - Step >= 1) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND IsFigure(ChessField[IndexI  - Step][IndexJ + Step])
-      THEN
-        BREAK;
-        
-      IF (IndexI - Step >= 1) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI - Step][IndexJ + Step] = Void)
-      THEN
-        ChessField[IndexI - Step][IndexJ + Step] := UnderAttack
-    END;
-  
-  FOR Step := 1 TO MAX_FIELD_SIZE
-  DO
-    BEGIN
-      IF (IndexJ + Step <= MAX_FIELD_SIZE) AND IsFigure(ChessField[IndexI][IndexJ + Step])
-      THEN
-        BREAK;
-        
-      IF (IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI][IndexJ + Step] = Void)
-      THEN
-        ChessField[IndexI][IndexJ + Step] := UnderAttack
-    END;  
-    
-  FOR Step := 1 TO MAX_FIELD_SIZE
-  DO
-    BEGIN
-      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND IsFigure(ChessField[IndexI + Step][IndexJ + Step])
-      THEN
-        BREAK;
-        
-      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI + Step][IndexJ + Step] = Void)
-      THEN
-        ChessField[IndexI + Step][IndexJ + Step] := UnderAttack
-    END;  
-    
+BEGIN  
   FOR Step := 1 TO MAX_FIELD_SIZE
   DO
     BEGIN
@@ -113,13 +77,30 @@ BEGIN
   FOR Step := 1 TO MAX_FIELD_SIZE
   DO
     BEGIN
-      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ - Step >= 1) AND IsFigure(ChessField[IndexI + Step][IndexJ - Step])
+      IF (IndexI - Step >= 1) AND IsFigure(ChessField[IndexI - Step][IndexJ])
       THEN
         BREAK;
         
-      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ - Step >= 1) AND (ChessField[IndexI + Step][IndexJ - Step] = Void)
+      IF (IndexI - Step >= 1) AND (ChessField[IndexI - Step][IndexJ] = Void)
       THEN
-        ChessField[IndexI + Step][IndexJ - Step] := UnderAttack
+        ChessField[IndexI - Step][IndexJ] := UnderAttack
+    END;
+END;
+
+PROCEDURE ProcessVerticalLine(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
+VAR
+  Step: INTEGER;
+BEGIN  
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexJ + Step <= MAX_FIELD_SIZE) AND IsFigure(ChessField[IndexI][IndexJ + Step])
+      THEN
+        BREAK;
+        
+      IF (IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI][IndexJ + Step] = Void)
+      THEN
+        ChessField[IndexI][IndexJ + Step] := UnderAttack
     END;
   
   FOR Step := 1 TO MAX_FIELD_SIZE
@@ -132,8 +113,49 @@ BEGIN
       IF (IndexJ - Step >= 1) AND (ChessField[IndexI][IndexJ - Step] = Void)
       THEN
         ChessField[IndexI][IndexJ - Step] := UnderAttack
-    END;   
+    END;
+END;
+
+PROCEDURE ProcessDiagonals(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
+VAR
+  Step: INTEGER;
+BEGIN
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexI - Step >= 1) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND IsFigure(ChessField[IndexI  - Step][IndexJ + Step])
+      THEN
+        BREAK;
+        
+      IF (IndexI - Step >= 1) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI - Step][IndexJ + Step] = Void)
+      THEN
+        ChessField[IndexI - Step][IndexJ + Step] := UnderAttack
+    END;
     
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND IsFigure(ChessField[IndexI + Step][IndexJ + Step])
+      THEN
+        BREAK;
+        
+      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI + Step][IndexJ + Step] = Void)
+      THEN
+        ChessField[IndexI + Step][IndexJ + Step] := UnderAttack
+    END;
+        
+  FOR Step := 1 TO MAX_FIELD_SIZE
+  DO
+    BEGIN
+      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ - Step >= 1) AND IsFigure(ChessField[IndexI + Step][IndexJ - Step])
+      THEN
+        BREAK;
+        
+      IF (IndexI + Step <= MAX_FIELD_SIZE) AND (IndexJ - Step >= 1) AND (ChessField[IndexI + Step][IndexJ - Step] = Void)
+      THEN
+        ChessField[IndexI + Step][IndexJ - Step] := UnderAttack
+    END;
+   
   FOR Step := 1 TO MAX_FIELD_SIZE
   DO
     BEGIN
@@ -144,36 +166,23 @@ BEGIN
       IF (IndexI - Step >= 1) AND (IndexJ - Step >= 1) AND (ChessField[IndexI - Step][IndexJ - Step] = Void)
       THEN
         ChessField[IndexI - Step][IndexJ - Step] := UnderAttack
-    END;  
-    
-  FOR Step := 1 TO MAX_FIELD_SIZE
-  DO
-    BEGIN
-      IF (IndexI - Step >= 1) AND IsFigure(ChessField[IndexI - Step][IndexJ])
-      THEN
-        BREAK;
-        
-      IF (IndexI - Step >= 1) AND (ChessField[IndexI - Step][IndexJ] = Void)
-      THEN
-        ChessField[IndexI - Step][IndexJ] := UnderAttack
-    END;
+    END;    
+END;    
+   
+PROCEDURE PaintOverChessFieldByQueenAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
+VAR
+  Step: INTEGER;
+BEGIN
+  ProcessDiagonals(ChessField, IndexI, IndexJ);
+  ProcessHorizontalLine(ChessField, IndexI, IndexJ);
+  ProcessVerticalLine(ChessField, IndexI, IndexJ);
 END;
 
 PROCEDURE PaintOverChessFieldByBishopAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
 VAR
   Step: INTEGER;
 BEGIN
-  FOR Step := 1 TO MAX_FIELD_SIZE
-  DO
-    BEGIN
-      IF (IndexI + IndexJ - Step >= 1) AND (IndexI + IndexJ - Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI + IndexJ - Step][Step] = Void)
-      THEN
-        ChessField[IndexI + IndexJ - Step][Step] := UnderAttack;
-        
-      IF (IndexI - IndexJ + Step >= 1) AND (IndexI - IndexJ + Step <= MAX_FIELD_SIZE) AND (ChessField[IndexI - IndexJ + Step][Step] = Void)
-      THEN
-        ChessField[IndexI - IndexJ + Step][Step] := UnderAttack
-    END
+  ProcessDiagonals(ChessField, IndexI, IndexJ);
 END;
 
 PROCEDURE PaintOverChessFieldByKnightAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
