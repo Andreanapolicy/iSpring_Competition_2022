@@ -31,10 +31,10 @@ BEGIN
     Bishop: Symbol := BISHOP_SYMBOL;
     Knight: Symbol := KNIGHT_SYMBOL;
     UnderAttack: Symbol := UNDER_ATTACK_SYMBOL;   
-    Void: Symbol := VOID_SYMBOL;
+    Void: Symbol := VOID_SYMBOL
   END;  
   
-  ConvertFieldStateToSymbol := Symbol;
+  ConvertFieldStateToSymbol := Symbol
 END;
 
 
@@ -45,17 +45,17 @@ BEGIN
   CASE Letter OF
     QUEEN_SYMBOL: State := Queen;
     BISHOP_SYMBOL: State := Bishop;
-    KNIGHT_SYMBOL: State := Knight;
+    KNIGHT_SYMBOL: State := Knight
   ELSE
     State := Void
   END;  
   
-  ConvertSymbolToFieldState := State;
+  ConvertSymbolToFieldState := State
 END;
 
 FUNCTION IsFigure(State: FieldState): BOOLEAN;
 BEGIN
-  IsFigure := (State = Queen) OR (State = Bishop) OR (State = Knight);
+  IsFigure := (State = Queen) OR (State = Bishop) OR (State = Knight)
 END;
   
 PROCEDURE ProcessHorizontalLine(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
@@ -84,7 +84,7 @@ BEGIN
       IF (IndexI - Step >= 1) AND (ChessField[IndexI - Step][IndexJ] = Void)
       THEN
         ChessField[IndexI - Step][IndexJ] := UnderAttack
-    END;
+    END
 END;
 
 PROCEDURE ProcessVerticalLine(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
@@ -113,7 +113,7 @@ BEGIN
       IF (IndexJ - Step >= 1) AND (ChessField[IndexI][IndexJ - Step] = Void)
       THEN
         ChessField[IndexI][IndexJ - Step] := UnderAttack
-    END;
+    END
 END;
 
 PROCEDURE ProcessDiagonals(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
@@ -166,7 +166,7 @@ BEGIN
       IF (IndexI - Step >= 1) AND (IndexJ - Step >= 1) AND (ChessField[IndexI - Step][IndexJ - Step] = Void)
       THEN
         ChessField[IndexI - Step][IndexJ - Step] := UnderAttack
-    END;    
+    END    
 END;    
    
 PROCEDURE PaintOverChessFieldByQueenAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
@@ -175,14 +175,14 @@ VAR
 BEGIN
   ProcessDiagonals(ChessField, IndexI, IndexJ);
   ProcessHorizontalLine(ChessField, IndexI, IndexJ);
-  ProcessVerticalLine(ChessField, IndexI, IndexJ);
+  ProcessVerticalLine(ChessField, IndexI, IndexJ)
 END;
 
 PROCEDURE PaintOverChessFieldByBishopAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
 VAR
   Step: INTEGER;
 BEGIN
-  ProcessDiagonals(ChessField, IndexI, IndexJ);
+  ProcessDiagonals(ChessField, IndexI, IndexJ)
 END;
 
 PROCEDURE PaintOverChessFieldByKnightAttack(VAR ChessField: Field; IndexI, IndexJ: INTEGER);
@@ -217,7 +217,7 @@ BEGIN
         
   IF (IndexI - 2 >= 1) AND (IndexJ + 1 <= MAX_FIELD_SIZE) AND (ChessField[IndexI - 2][IndexJ + 1] = Void)
   THEN
-    ChessField[IndexI - 2][IndexJ + 1] := UnderAttack;
+    ChessField[IndexI - 2][IndexJ + 1] := UnderAttack
 END;
 
 PROCEDURE InitChessField(VAR ChessField: Field);
@@ -271,7 +271,7 @@ BEGIN
            CASE ChessField[IndexI][IndexJ] OF
              Queen: PaintOverChessFieldByQueenAttack(ChessField, IndexI, IndexJ);
              Bishop: PaintOverChessFieldByBishopAttack(ChessField, IndexI, IndexJ);
-             Knight: PaintOverChessFieldByKnightAttack(ChessField, IndexI, IndexJ);
+             Knight: PaintOverChessFieldByKnightAttack(ChessField, IndexI, IndexJ)
            END  
         END
     END
